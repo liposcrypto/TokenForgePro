@@ -1,0 +1,29 @@
+# scripts/main.py
+
+from web3 import Web3
+from scripts.token_creation import deploy_erc20_token
+from scripts.token_management import get_token_balance, transfer_tokens
+from utils.blockchain_utils import load_csv, save_csv
+
+def main():
+    # Setup
+    web3 = Web3(Web3.HTTPProvider('https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID'))
+    
+    # Token Creation
+    with open('contracts/ERC20Token.sol', 'r') as file:
+        contract_source = file.read()
+    private_key = 'YOUR_PRIVATE_KEY'
+    account_address = 'YOUR_ACCOUNT_ADDRESS'
+    address, abi = deploy_erc20_token(web3, contract_source, 'ERC20Token', 'MyToken', 'MTK', 1000000, private_key, account_address)
+    print(f'Token deployed at: {address}')
+    
+    # Token Management
+    balance = get_token_balance(web3, address, abi, account_address)
+    print(f'Balance: {balance}')
+    
+    # Transfer Tokens
+    tx_receipt = transfer_tokens(web3, address, abi, private_key, account_address, 'RECIPIENT_ADDRESS', 100)
+    print(f'Transaction Receipt: {tx_receipt}')
+
+if __name__ == "__main__":
+    main()
